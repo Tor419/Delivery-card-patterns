@@ -1,6 +1,7 @@
 package ru.netology.delivery.test;
 
 import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.SelenideElement;
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,7 +25,10 @@ class DeliveryTest {
 
     @BeforeEach
     void setup() {
-        open("http://localhost:9999");
+        Configuration.holdBrowserOpen = true;
+        Configuration.browserSize = "1800x1100";
+        Configuration.timeout = 15000;
+        open("http://localhost:9999/");
     }
 
     @Test
@@ -49,9 +53,12 @@ class DeliveryTest {
         $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         $("[data-test-id=date] input").setValue(secondMeetingDate);
         $(byText("Запланировать")).click();
-        $("[data-test-id='replan-notification'].notification__content")
+        $("[data-test-id=replan-notification] .notification__content")
                 .shouldHave(text("У вас уже запланирована встреча на другую дату. Перепланировать?"))
                 .shouldBe(visible);
-        $("[data-test-id='replan-notification'].notification__content.button").click();
+        $("[data-test-id=replan-notification] .button").click();
+        $("[data-test-id=success-notification] .notification__content")
+                .shouldHave(exactText("Встреча успешно запланирована на " + secondMeetingDate))
+                .shouldBe(visible);
     }
 }
